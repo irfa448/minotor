@@ -33,7 +33,7 @@
         });
 
         async function updateData() {
-            let response = await fetch("https://your-worker-name.workers.dev/");
+            let response = await fetch("https://workers-playground-winter-shadow-5f92.tiohartanto55.workers.dev/");
             let data = await response.text();
             document.getElementById("total").innerText = data.match(/\d+/) ? data.match(/\d+/)[0] : "0";
 
