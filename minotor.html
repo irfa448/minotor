@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitor Traffic</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        canvas { max-width: 600px; margin: auto; }
+    </style>
+</head>
+<body>
+    <h1>Monitor Traffic</h1>
+    <p>Total Requests: <span id="total">0</span></p>
+    <canvas id="chart"></canvas>
+
+    <script>
+        let ctx = document.getElementById("chart").getContext("2d");
+        let chart = new Chart(ctx, {
+            type: "line",
+            data: {
+                labels: [],
+                datasets: [{
+                    label: "Requests Per Second",
+                    data: [],
+                    borderColor: "red",
+                    borderWidth: 2,
+                    fill: false
+                }]
+            },
+            options: { responsive: true, scales: { x: { display: false } } }
+        });
+
+        async function updateData() {
+            let response = await fetch("https://your-worker-name.workers.dev/");
+            let data = await response.text();
+            document.getElementById("total").innerText = data.match(/\d+/) ? data.match(/\d+/)[0] : "0";
+
+            if (chart.data.labels.length > 50) {
+                chart.data.labels.shift();
+                chart.data.datasets[0].data.shift();
+            }
+
+            chart.data.labels.push(new Date().toLocaleTimeString());
+            chart.data.datasets[0].data.push(parseInt(document.getElementById("total").innerText));
+            chart.update();
+        }
+
+        setInterval(updateData, 1000);
+    </script>
+</body>
+</html>
